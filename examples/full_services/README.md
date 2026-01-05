@@ -1,0 +1,80 @@
+# Example 2: Full Services CCE Subscription Onboarding
+
+This example demonstrates the configuration required to onboard an Azure Subscription to CyberArk CCE (Connect Cloud Environments) with multiple services enabled.
+
+## What This Example Does
+
+* Onboards your Azure Subscription to CyberArk CCE  
+* Enables Dummy - an example service  
+* Enables Dummy Two - another example service  
+
+## Prerequisites
+
+* Azure Subscription and entra credentials  
+* CyberArk tenant with CCE  
+* Terraform >= 1.8.5  
+* CyberArk `idsec` provider configured - https://registry.terraform.io/providers/cyberark/idsec/latest/docs#example-usage  
+
+## Usage
+
+1. Update the values in `terraform.tfvars`:  
+
+    ```hcl
+    entra_id          = "0b659685-1a00-43cd-b994-555bac390ecf"
+    entra_tenant_name = "Test Entra"
+    subscription_id   = "123456789012"
+    subscription_name = "1b3af1a2-f15e-4ea8-8814-1adb073a8cde"
+    ```
+
+2. Initialize Terraform:  
+
+    ```bash
+    terraform init
+    ```
+
+3. Review the plan:  
+
+    ```bash
+    terraform plan
+    ```
+
+4. Apply the configuration:  
+
+    ```bash
+    terraform apply
+    ```
+
+## What Gets Created
+
+### In Azure 
+
+* Azure AD Application: `CyberArk-Dummy-app`  
+* Service Principal for the Dummy application  
+* Microsoft Graph API Permissions with admin consent for Dummy app:  
+  * `AuditLog.Read.All` - Allows reading audit log data  
+  * `Directory.Read.All` - Allows reading directory data  
+* Azure AD Application: `CyberArk-DummyTwo-app`  
+* Service Principal for the Dummy Two application  
+* Azure role assignment for Dummy Two: `cyberark-cob-dummy-two-test-role`  
+* Federated Identity Credentials for workload identity federation  
+
+### In CyberArk
+
+* Subscription registration in CCE  
+* Dummy service enabled  
+* Dummy Two service enabled  
+
+## Outputs
+
+This example outputs:
+
+* `dummy_app_id`: The Application (client) ID of the CyberArk Dummy app  
+* `dummy_two_app_id`: The Application (client) ID of the CyberArk Dummy Two app  
+
+## Next Steps
+
+After successful deployment:
+
+1. Verify the subscription appears in your CyberArk CCE console  
+2. Verify both Dummy and Dummy Two services are active  
+3. For a simpler example with only one service, see [basic](../basic/)  

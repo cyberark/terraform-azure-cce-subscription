@@ -9,8 +9,7 @@ The module creates the necessary Azure AD applications, service principals, fede
 - **Automated Azure Subscription Onboarding** to CyberArk CCE  
 - **Workload Identity Federation (WIF)** support for secure, passwordless authentication  
 - **Modular Service Architecture** with optional service enablement:  
-  - `dummy`: Creates Azure AD app with Microsoft Graph API permissions (AuditLog.Read.All, Directory.Read.All)  
-  - `dummy_two`: Creates Azure AD app with custom Azure role assignments  
+  - `service`: Creates Azure AD app with Microsoft Graph API permissions (AuditLog.Read.All, Directory.Read.All)  
 - **Flexible Configuration** - Enable or disable services as needed  
 - **Zero Secrets Management** - Uses federated credentials instead of client secrets  
 - **Automatic Federated Identity Credential Setup** for each enabled service  
@@ -81,12 +80,8 @@ module "cce_azure_subscription" {
   subscription_name = "Production Subscription"
   
   # Enable services as needed
-  dummy = {
+  service = {
     enable = true
-  }
-  
-  dummy_two = {
-    enable = false
   }
 }
 ```
@@ -99,31 +94,22 @@ module "cce_azure_subscription" {
 | `entra_tenant_name` | The Azure Entra tenant name | `string` | Yes | - |
 | `subscription_id` | The Azure subscription ID to onboard | `string` | Yes | - |
 | `subscription_name` | The Azure subscription name | `string` | Yes | - |
-| `dummy.enable` | Enable the Dummy service with Microsoft Graph permissions | `bool` | No | `false` |
-| `dummy_two.enable` | Enable the Dummy Two service with custom role assignments | `bool` | No | `false` |
+| `service.enable` | Enable the Service with Microsoft Graph permissions | `bool` | No | `false` |
 
 ### Outputs
 
 | Name | Description |
 |------|-------------|
-| `dummy_app_id` | The Application (client) ID of the CyberArk Dummy app |
-| `dummy_two_app_id` | The Application (client) ID of the CyberArk Dummy Two app |
+| `service_app_id` | The Application (client) ID of the Service app |
 
 ### What Gets Created
 
-#### When `dummy` Service is Enabled:
-- Azure AD Application: `CyberArk-Dummy-app`  
+#### When `service` is Enabled:
+- Azure AD Application: `Service-app`  
 - Service Principal for the application  
 - Microsoft Graph API permissions with admin consent:  
   - `AuditLog.Read.All` (Application permission)  
   - `Directory.Read.All` (Application permission)  
-- Federated Identity Credential using CyberArk WIF parameters  
-
-#### When `dummy_two` Service is Enabled:
-- Azure AD Application: `CyberArk-DummyTwo-app`  
-- Service Principal for the application  
-- Azure role assignment with pre-defined role: `cyberark-cob-dummy-two-test-role`  
-- Role assignment scope: subscription or management group level  
 - Federated Identity Credential using CyberArk WIF parameters  
 
 #### In CyberArk CCE:
@@ -134,10 +120,9 @@ module "cce_azure_subscription" {
 ## Documentation
 
 ### Examples
-This repository includes complete examples:
+This repository includes a complete example:
 
 - **[basic](./examples/basic/)** - Minimal configuration with one service enabled  
-- **[full_services](./examples/full_services/)** - Advanced configuration with multiple services  
 
 ### Service Modules Architecture
 
@@ -145,11 +130,7 @@ The module uses a modular architecture where each service is implemented as a se
 
 ```
 services_modules/
-├── dummy/          # Microsoft Graph API integration
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
-└── dummy_two/      # Custom Azure role integration
+└── service/        # Microsoft Graph API integration
     ├── main.tf
     ├── variables.tf
     └── outputs.tf
@@ -175,7 +156,7 @@ This module leverages Workload Identity Federation (WIF) to enable secure, passw
 
 - **cyberark/idsec** (~> 0.1) - CyberArk Identity Security provider for CCE integration  
 - **hashicorp/azuread** (~> 3.0) - Azure Active Directory provider  
-- **hashicorp/azurerm** (~> 4.0) - Azure Resource Manager provider (used in dummy_two service)  
+- **hashicorp/azurerm** (~> 4.0) - Azure Resource Manager provider  
 
 ## Licensing  
 This repository is subject to the following licenses:  

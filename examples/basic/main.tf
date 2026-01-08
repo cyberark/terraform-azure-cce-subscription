@@ -36,6 +36,6 @@ module "cce_cyberark_azure_subscription" {
   entra_tenant_name = var.entra_tenant_name
   subscription_id   = var.subscription_id
   subscription_name = var.subscription_name
-  dummy             = { enable = true }
+  service           = { enable = true }
 }
 

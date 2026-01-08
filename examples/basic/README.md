@@ -5,7 +5,7 @@ This example demonstrates the minimal configuration required to onboard an Azure
 ## What This Example Does
 
 * Onboards your Azure Subscription to CyberArk CCE  
-* Enables Dummy - an example service  
+* Enables Service - an example service  
 
 ## Prerequisites
 
@@ -47,8 +47,8 @@ This example demonstrates the minimal configuration required to onboard an Azure
 
 ### In Azure 
 
-* Azure AD Application: `CyberArk-Dummy-app`  
-* Service Principal for the Dummy application  
+* Azure AD Application: `Service-app`  
+* Service Principal for the Service application  
 * Microsoft Graph API Permissions with admin consent:  
   * `AuditLog.Read.All` - Allows reading audit log data  
   * `Directory.Read.All` - Allows reading directory data  
@@ -57,18 +57,17 @@ This example demonstrates the minimal configuration required to onboard an Azure
 ### In CyberArk
 
 * Subscription registration in CCE  
-* Dummy service enabled  
+* Service enabled  
 
 ## Outputs
 
 This example outputs:
 
-* `dummy_app_id`: The Application (client) ID of the CyberArk Dummy app  
+* `service_app_id`: The Application (client) ID of the Service app  
 
 ## Next Steps
 
 After successful deployment:
 
 1. Verify the subscription appears in your CyberArk CCE console  
-2. Verify Dummy service is active  
-3. To enable additional services, see [full\_services](../full_services/)  
+2. Verify Service is active  

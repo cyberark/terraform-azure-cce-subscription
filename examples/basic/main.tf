@@ -10,7 +10,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.1"
+      version = "~> 0.2.1"
     }
   }
 
@@ -36,6 +36,6 @@ module "cce_cyberark_azure_subscription" {
   entra_tenant_name = var.entra_tenant_name
   subscription_id   = var.subscription_id
   subscription_name = var.subscription_name
-  service           = { enable = true }
+  sia               = { enable = true } # Enable SIA (Secure Infrastructure Access)
 }
 

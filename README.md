@@ -154,7 +154,7 @@ This repository includes a complete example:
 The module uses a modular architecture where each service is implemented as a separate sub-module:
 
 ```
-services_modules/
+modules/
 └── sia/            # SIA (Secure Infrastructure Access) integration
     ├── main.tf
     ├── variables.tf

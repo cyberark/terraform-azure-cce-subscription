@@ -17,7 +17,7 @@ locals {
 }
 
 module "sia" {
-  source            = "./services_modules/sia"
+  source            = "./modules/sia"
   subscription_id   = var.subscription_id
   identity_issuer   = local.sia_wif_data["identity_app_issuer"]
   identity_user_id  = local.sia_wif_data["identity_user_id"]
@@ -26,7 +26,7 @@ module "sia" {
 }
 
 module "sca" {
-  source          = "./services_modules/sca"
+  source          = "./modules/sca"
   count           = var.sca.enable && var.sca.shared_resources != null ? 1 : 0
   subscription_id = var.subscription_id
   shared_resources = {

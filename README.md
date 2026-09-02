@@ -60,7 +60,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.2.1"
+      version = "0.10.0"
     }
   }
   required_version = ">= 1.8.5"
@@ -179,7 +179,7 @@ This module leverages Workload Identity Federation (WIF) to enable secure passwo
 
 ### Terraform Providers
 
-- **cyberark/idsec** (~> 0.2.1) - CyberArk Identity Security provider for CCE integration  
+- **cyberark/idsec** (0.10.0) - CyberArk Identity Security provider for CCE integration  
 - **hashicorp/azuread** (~> 3.0) - Azure Active Directory provider  
 - **hashicorp/azurerm** (~> 4.0) - Azure Resource Manager provider  
 

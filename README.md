@@ -114,6 +114,7 @@ module "cce_azure_subscription" {
 | Name | Description |
 |------|-------------|
 | `sia_app_id` | The SIA app registration ID (client) (if enabled) |
+| `subscription_onboarding_id` | The ID of the subscription onboarding in CCE (null when no service is enabled) |
 
 ### What Gets Created
 

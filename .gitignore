@@ -5,3 +5,12 @@
 *.tfplan
 *.out
 .idea
+
+# Python / test artifacts
+.venv/
+# Isolated working dirs created by the apply/destroy test tier
+tests/fixtures/apply_*/
+__pycache__/
+*.pyc
+.pytest_cache/
+test-results.xml

@@ -108,6 +108,8 @@ module "cce_azure_subscription" {
 | `sia.enable` | Enable SIA (Secure Infrastructure Access) | `bool` | No | `false` |
 | `sca.enable` | Enable SCA at subscription scope | `bool` | No | `false` |
 | `sca.shared_resources` | SCA shared resources from Commons output (required when sca.enable = true). Must include resource_app_id, resource_custom_role_id, resource_wif_user_id. | `object` | `null` | No |
+| `sca.shared_resources.add_permissions_to_manage_cluster` | When true, assigns the K8s custom role at this subscription scope. Requires `resource_k8s_custom_role_id` to be non-empty. | `bool` | No | `false` |
+| `sca.shared_resources.resource_k8s_custom_role_id` | The K8s custom role ID from Commons output (required when `add_permissions_to_manage_cluster` is true). | `string` | No | `null` |
 
 ### Outputs
 
@@ -137,6 +139,7 @@ module "cce_azure_subscription" {
 #### When SCA is Enabled (with `sca.enable = true` and `sca.shared_resources` from Commons):
 - Role assignment of the SCA resource app (from Commons) to the SCA resource custom role at this subscription scope
 - SCA service registration in CCE for the subscription. The resource app and custom role are created by Commons; this module only performs the role assignment at subscription scope and idsec registration.
+- When `shared_resources.add_permissions_to_manage_cluster` is true, assigns the K8s custom role at this subscription scope
 
 #### In CCE:
 - Azure subscription registered in CCE  

@@ -11,9 +11,9 @@ This example demonstrates the minimal configuration required to onboard an Azure
 ## Prerequisites
 
 * Azure subscription and Microsoft Entra tenant credentials  
-* CyberArk tenant with CCE  
+* Idira tenant with CCE  
 * Terraform >= 1.8.5  
-* CyberArk `idsec` provider configured - https://registry.terraform.io/providers/cyberark/idsec/latest/docs#example-usage  
+* Idira `idsec` provider configured - https://registry.terraform.io/providers/cyberark/idsec/latest/docs#example-usage  
 * For SCA: run the Commons module first and pass its `sca` output as `shared_resources`
 
 ## Usage
@@ -104,5 +104,5 @@ When SCA is enabled, SCA app IDs and WIF user IDs come from the Commons module o
 
 After successful deployment:
 
-1. Verify the subscription appears in your CCE console  
-2. Verify SIA (Secure Infrastructure Access) is active and can discover VMs  
+1. Verify the subscription appears in CCE. 
+2. Verify SIA (Secure Infrastructure Access) is active and can discover VMs.

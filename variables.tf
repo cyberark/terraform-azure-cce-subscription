@@ -1,25 +1,25 @@
 variable "entra_id" {
-  description = "The Azure entra ID"
+  description = "The Microsoft Entra tenant ID."
   type        = string
 }
 
 variable "entra_tenant_name" {
-  description = "The Azure entra name"
+  description = "The Microsoft Entra tenant name."
   type        = string
 }
 
 variable "subscription_id" {
-  description = "The Azure subscription ID"
+  description = "The Azure subscription ID."
   type        = string
 }
 
 variable "subscription_name" {
-  description = "The Azure subscription name"
+  description = "The Azure subscription name."
   type        = string
 }
 
 variable "sia" {
-  description = "Configuration for the sia feature."
+  description = "SIA configuration."
   type = object({
     enable = optional(bool, true)
   })
@@ -27,7 +27,7 @@ variable "sia" {
 }
 
 variable "sca" {
-  description = "SCA config. When enable is true, shared_resources (from commons output) is required; subscription only consumes it and assigns resource app to this subscription scope. Pass through add_permissions_to_manage_cluster and resource_k8s_custom_role_id from commons; when true, assigns the K8s custom role at this subscription."
+  description = "SCA configuration. When **enable** is true, shared_resources (from commons output) is required. The subscription only consumes it and assigns the resource app to this subscription scope. Pass through add_permissions_to_manage_cluster and resource_k8s_custom_role_id from commons; when true, assigns the K8s custom role to this subscription."
   type = object({
     enable = optional(bool, false)
     shared_resources = optional(object({
@@ -54,7 +54,7 @@ variable "sca" {
         try(var.sca.shared_resources.resource_wif_user_id, null) != null &&
       try(length(var.sca.shared_resources.resource_wif_user_id), 0) > 0)
     )
-    error_message = "When SCA is enabled (sca.enable = true), sca.shared_resources must be set with non-empty resource_app_id, resource_custom_role_id, and resource_wif_user_id (from commons output)."
+    error_message = "When SCA is enabled (sca.enable = true), sca.shared_resources must be set with the resource_app_id, resource_custom_role_id, and resource_wif_user_id (from commons output)."
   }
 
   validation {
@@ -63,7 +63,7 @@ variable "sca" {
       try(var.sca.shared_resources.add_permissions_to_manage_cluster, false) ==
       (try(var.sca.shared_resources.resource_k8s_custom_role_id, null) != null)
     )
-    error_message = "add_permissions_to_manage_cluster and resource_k8s_custom_role_id must both be set or both be unset — they must agree."
+    error_message = "add_permissions_to_manage_cluster and resource_k8s_custom_role_id must both either be set or not set. No mixed values."
   }
 }
 

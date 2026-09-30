@@ -10,7 +10,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "0.10.0"
+      version = "0.12.1"
     }
   }
 
@@ -26,7 +26,7 @@ provider "azuread" {
 }
 
 provider "idsec" {
-  # Configure your CyberArk credentials here or via environment variables
+  # Configure your Idira credentials here or via environment variables
   # See: https://registry.terraform.io/providers/cyberark/idsec/latest/docs
 }
 

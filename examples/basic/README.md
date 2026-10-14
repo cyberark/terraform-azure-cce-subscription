@@ -86,7 +86,7 @@ This example demonstrates the minimal configuration required to onboard an Azure
 * Role assignment of the SCA resource app (from Commons) to the SCA resource custom role at this subscription scope
 * SCA service registration in CCE for the subscription
 
-### In CyberArk
+### In Idira
 
 * Subscription registration in CCE  
 * SIA (Secure Infrastructure Access) enabled for VM discovery and privileged access  

@@ -1,7 +1,7 @@
 # CCE Azure Subscription Onboarding Module
 
-This Terraform module onboards Azure subscriptions to Connect Cloud Environments (CCE) with CyberArk SaaS services. It uses Workload Identity Federation (WIF) for secure keyless authentication between CCE and Azure resources.
-CCE helps customers easily adopt CyberArk services and establish secure trust relationships with their Azure environments.
+This Terraform module onboards Azure subscriptions to Connect Cloud Environments (CCE) with Idira SaaS services. It uses Workload Identity Federation (WIF) for secure keyless authentication between CCE and Azure resources.
+CCE helps customers easily adopt Idira services and establish secure trust relationships with their Azure environments.
 
 ## Overview  
 
@@ -22,7 +22,7 @@ The module creates the necessary Microsoft Entra ID applications, service princi
 
 Before using this module, ensure that you have the following information and requirements:
 
-1. **CyberArk Identity Security Platform Account**
+1. **Idira Identity Security Platform Account**
    - API credentials (client ID and secret)
    - Tenant URL
 
@@ -38,7 +38,7 @@ Before using this module, ensure that you have the following information and req
    - Terraform >= 1.8.5
    - Microsoft Entra ID Provider
    - Azure RM Provider
-   - CyberArk idsec Provider
+   - Idira idsec Provider
 
 4. **For SCA (Secure Cloud Access)**
    - Use the Commons module (`terraform-azure-cce-commons`) in your root configuration and pass its `sca` output as `sca.shared_resources` when enabling SCA at subscription scope.
@@ -74,7 +74,7 @@ provider "azurerm" {
 provider "azuread" {}
 
 provider "idsec" {
-  # Configure with your CyberArk tenant credentials
+  # Configure with your Idira tenant credentials
   # See: https://registry.terraform.io/providers/cyberark/idsec/latest/docs
 }
 

@@ -20,13 +20,13 @@ data "azuread_service_principal" "sca_resource_app_sp" {
 # Assign the SCA resource app to the SCA resource custom role at this subscription scope (per sca.sh OnboardAzureResource)
 resource "azurerm_role_assignment" "sca_resource_at_subscription" {
   scope              = "/subscriptions/${var.subscription_id}"
-  role_definition_id = var.shared_resources.resource_custom_role_id
+  role_definition_id = "/subscriptions/${var.subscription_id}${var.shared_resources.resource_custom_role_id}"
   principal_id       = data.azuread_service_principal.sca_resource_app_sp.object_id
 }
 
 resource "azurerm_role_assignment" "sca_resource_k8s_at_subscription" {
   count              = var.shared_resources.add_permissions_to_manage_cluster ? 1 : 0
   scope              = "/subscriptions/${var.subscription_id}"
-  role_definition_id = var.shared_resources.resource_k8s_custom_role_id
+  role_definition_id = "/subscriptions/${var.subscription_id}${var.shared_resources.resource_k8s_custom_role_id}"
   principal_id       = data.azuread_service_principal.sca_resource_app_sp.object_id
 }

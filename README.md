@@ -13,6 +13,7 @@ The module creates the necessary Microsoft Entra ID applications, service princi
 - **Modular Service Architecture** with optional service enablement:  
   - `sia`: SIA (Secure Infrastructure Access) for VM discovery and privileged access management
   - `sca`: SCA (Secure Cloud Access) using shared resources from the Commons module; assigns the SCA resource app to the SCA resource custom role at subscription scope
+  - `cds`: Cloud Discovery using shared resources from the Commons module; assigns the Cloud Discovery resource app to the Cloud Discovery resource custom role at subscription scope
 - **Flexible Configuration** - Enable or disable services as needed  
 - **Zero Secrets Management** - Uses federated credentials instead of client secrets  
 - **Automatic Federated Identity Credential Setup** for each enabled service  
@@ -42,6 +43,9 @@ Before using this module, ensure that you have the following information and req
 
 4. **For SCA (Secure Cloud Access)**
    - Use the Commons module (`terraform-azure-cce-commons`) in your root configuration and pass its `sca` output as `sca.shared_resources` when enabling SCA at subscription scope.
+
+5. **For Cloud Discovery**
+   - Use the Commons module (`terraform-azure-cce-commons`) with `cds.enable = true` in your root configuration and pass its `cds` output as `cds.shared_resources`. See the `examples/cloud_discovery_onboarding` example ("Onboard Specific Management Groups or Subscriptions" section) in `terraform-azure-cce-commons`.
 
 ## Usage  
 
@@ -94,6 +98,11 @@ module "cce_azure_subscription" {
     enable           = true
     shared_resources = module.cce_azure_shared.sca  # From terraform-azure-cce-commons
   }
+  # Enable Cloud Discovery (requires Commons module with cds.enable = true; pass shared_resources)
+  cds = {
+    enable           = true
+    shared_resources = module.cce_azure_shared.cds  # From terraform-azure-cce-commons
+  }
 }
 ```
 
@@ -110,6 +119,8 @@ module "cce_azure_subscription" {
 | `sca.shared_resources` | SCA shared resources from Commons output (required when sca.enable = true). Must include resource_app_id, resource_custom_role_id, resource_wif_user_id. | `object` | `null` | No |
 | `sca.shared_resources.add_permissions_to_manage_cluster` | When true, assigns the K8s custom role at this subscription scope. Requires `resource_k8s_custom_role_id` to be non-empty. | `bool` | No | `false` |
 | `sca.shared_resources.resource_k8s_custom_role_id` | The K8s custom role ID from Commons output (required when `add_permissions_to_manage_cluster` is true). | `string` | No | `null` |
+| `cds.enable` | Enable Cloud Discovery at subscription scope | `bool` | No | `false` |
+| `cds.shared_resources` | Cloud Discovery shared resources from Commons output (required when cds.enable = true). Must include entra_app_id, entra_wif_user_id, resource_app_id, resource_custom_role_id, resource_wif_user_id. | `object` | No | `null` |
 
 ### Outputs
 
@@ -140,6 +151,11 @@ module "cce_azure_subscription" {
 - Role assignment of the SCA resource app (from Commons) to the SCA resource custom role at this subscription scope
 - SCA service registration in CCE for the subscription. The resource app and custom role are created by Commons; this module only performs the role assignment at subscription scope and idsec registration.
 - When `shared_resources.add_permissions_to_manage_cluster` is true, assigns the K8s custom role at this subscription scope
+
+#### When Cloud Discovery is Enabled (with `cds.enable = true` and `cds.shared_resources` from Commons):
+- Role assignment of the Cloud Discovery resource app (from Commons) to the Cloud Discovery resource custom role at this subscription scope
+- Cloud Discovery service registration in CCE for the subscription, including both Cloud Discovery apps (Entra and resource). The apps, custom roles and the Entra app's root management group assignment are created by Commons.
+- To offboard Cloud Discovery, set `cds.enable = false` and apply. Only after every level is offboarded, disable Cloud Discovery in Commons and apply to delete the shared resources. Do not remove the module block or run `terraform destroy`. This will offboard every service, not only Cloud Discovery.
 
 #### In CCE:
 - Azure subscription registered in CCE  

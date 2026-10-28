@@ -13,7 +13,7 @@ data "idsec_cce_azure_identity_params" "get_wif_data" {}
 
 locals {
   sia_wif_data               = try(data.idsec_cce_azure_identity_params.get_wif_data.identity_params["dpa"], null)
-  at_least_1_service_enabled = var.sia.enable == true || var.sca.enable == true
+  at_least_1_service_enabled = var.sia.enable == true || var.sca.enable == true || var.cds.enable == true
 }
 
 module "sia" {
@@ -38,6 +38,16 @@ module "sca" {
   }
 }
 
+module "cds" {
+  source          = "./modules/cds"
+  count           = var.cds.enable && var.cds.shared_resources != null ? 1 : 0
+  subscription_id = var.subscription_id
+  shared_resources = {
+    resource_app_id         = var.cds.shared_resources.resource_app_id
+    resource_custom_role_id = var.cds.shared_resources.resource_custom_role_id
+  }
+}
+
 # Create a simple Azure subscription onboarding
 resource "idsec_cce_azure_subscription" "create_subscription" {
   entra_id          = var.entra_id
@@ -46,9 +56,10 @@ resource "idsec_cce_azure_subscription" "create_subscription" {
   subscription_name = var.subscription_name
   count             = local.at_least_1_service_enabled ? 1 : 0
 
-  depends_on = [module.sca, module.sia, ]
+  depends_on = [module.sca, module.sia, module.cds, ]
 
-  services = concat(
+  # flatten, not concat: the services' resources have different types
+  services = flatten([
     # Add sia service if enabled
     var.sia.enable ? [
       {
@@ -78,6 +89,29 @@ resource "idsec_cce_azure_subscription" "create_subscription" {
           } : {}
         )
       }
+    ] : [],
+
+    var.cds.enable && var.cds.shared_resources != null ? [
+      {
+        service_name = "cds"
+        version      = "2.1.0"
+        resources = {
+          application_ids = [
+            var.cds.shared_resources.entra_app_id,
+            var.cds.shared_resources.resource_app_id,
+          ]
+          applications = [
+            {
+              application_id            = var.cds.shared_resources.entra_app_id
+              identity_trusted_username = var.cds.shared_resources.entra_wif_user_id
+            },
+            {
+              application_id            = var.cds.shared_resources.resource_app_id
+              identity_trusted_username = var.cds.shared_resources.resource_wif_user_id
+            }
+          ]
+        }
+      }
     ] : []
-  )
+  ])
 }

@@ -1,12 +1,13 @@
-# Example: Basic CCE Subscription Onboarding with SIA and SCA
+# Example: Basic CCE Subscription Onboarding with SIA, SCA and Cloud Discovery
 
-This example demonstrates the minimal configuration required to onboard an Azure subscription to Connect Cloud Environments (CCE) with SIA (Secure Infrastructure Access) enabled. Optionally, SCA (Secure Cloud Access) can be enabled by passing `shared_resources` from the Commons module.
+This example demonstrates the minimal configuration required to onboard an Azure subscription to Connect Cloud Environments (CCE) with SIA (Secure Infrastructure Access) enabled. Optionally, SCA (Secure Cloud Access) and Cloud Discovery (for Cloud service entitlements) can be enabled by passing `shared_resources` from the Commons module.
 
 ## What This Example Does
 
 * Onboards your Azure subscription to CCE  
 * Enables SIA (Secure Infrastructure Access) for VM discovery and privileged access management  
 * Optionally enables SCA at subscription scope (when `sca.shared_resources` from Commons is provided)
+* Optionally enables Cloud Discovery (for Cloud service entitlements) for the subscription (when `cds.shared_resources` from Commons is provided, see step 2 below)
 
 ## Prerequisites
 
@@ -15,6 +16,7 @@ This example demonstrates the minimal configuration required to onboard an Azure
 * Terraform >= 1.8.5  
 * Idira `idsec` provider configured - https://registry.terraform.io/providers/cyberark/idsec/latest/docs#example-usage  
 * For SCA: run the Commons module first and pass its `sca` output as `shared_resources`
+* For Cloud Discovery: run the Commons module with `cds = { enable = true }` and pass its `cds` output as `cds.shared_resources`
 
 ## Usage
 
@@ -27,13 +29,14 @@ This example demonstrates the minimal configuration required to onboard an Azure
     subscription_name = "1b3af1a2-f15e-4ea8-8814-1adb073a8cde"
     ```
 
-2. To enable SCA, use the Commons module in your root configuration and pass its output:
+2. To enable SCA or Cloud Discovery, use the Commons module in your root configuration and pass its output:
 
     ```hcl
     module "cce_azure_shared" {
       source   = "path/to/terraform-azure-cce-commons"
       entra_id = var.entra_id
       sca      = { enable = true, parameters = { sca_entra_onboarding = true, ... } }
+      cds      = { enable = true }
     }
 
     module "cce_azure_subscription" {
@@ -47,8 +50,14 @@ This example demonstrates the minimal configuration required to onboard an Azure
         enable           = true
         shared_resources = module.cce_azure_shared.sca
       }
+      cds = {
+        enable           = true
+        shared_resources = module.cce_azure_shared.cds
+      }
     }
     ```
+
+    For the full Cloud Discovery steps, including offboarding, see the `examples/cloud_discovery_onboarding` example in `terraform-azure-cce-commons`.
 
 3. Initialize Terraform:  
 
@@ -86,11 +95,16 @@ This example demonstrates the minimal configuration required to onboard an Azure
 * Role assignment of the SCA resource app (from Commons) to the SCA resource custom role at this subscription scope
 * SCA service registration in CCE for the subscription
 
+**When Cloud Discovery is enabled** (with `cds.enable = true` and `cds.shared_resources` from Commons):
+* Cloud Discovery access for the subscription, using the shared resources from Commons
+* Cloud Discovery service registration in CCE for the subscription
+
 ### In Idira
 
 * Subscription registration in CCE  
 * SIA (Secure Infrastructure Access) enabled for VM discovery and privileged access  
 * SCA service resources for the subscription
+* Cloud Discovery service resources for the subscription
 
 ## Outputs
 
@@ -98,7 +112,7 @@ This example outputs:
 
 * `sia_app_id`: The SIA app registration (client) ID (when SIA enabled)
 
-When SCA is enabled, SCA app IDs and WIF user IDs come from the Commons module output; this example does not expose separate SCA outputs.
+When SCA or Cloud Discovery is enabled, their app IDs and WIF user IDs come from the Commons module output; this example does not expose separate SCA or Cloud Discovery outputs.
 
 ## Next Steps
 

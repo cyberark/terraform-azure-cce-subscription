@@ -75,19 +75,15 @@ resource "idsec_cce_azure_subscription" "create_subscription" {
       {
         service_name = "sca"
         version      = "0.0.4"
-        resources = merge(
-          {
-            applications = [
-              {
-                application_id            = var.sca.shared_resources.resource_app_id
-                identity_trusted_username = var.sca.shared_resources.resource_wif_user_id
-              }
-            ]
-          },
-          try(var.sca.shared_resources.add_permissions_to_manage_cluster, false) ? {
-            add_permissions_to_manage_cluster = true
-          } : {}
-        )
+        resources = {
+          applications = [
+            {
+              application_id            = var.sca.shared_resources.resource_app_id
+              identity_trusted_username = var.sca.shared_resources.resource_wif_user_id
+            }
+          ]
+          add_permissions_to_manage_cluster = try(var.sca.shared_resources.add_permissions_to_manage_cluster, false)
+        }
       }
     ] : [],
 

@@ -16,6 +16,28 @@ locals {
   at_least_1_service_enabled = var.sia.enable == true || var.sca.enable == true || var.cds.enable == true
 }
 
+# Service versions this module registers in CCE. The commons module exposes the version of the resources it
+# created in the `version` field of each service output, and the two must match: otherwise this module would
+# register a service version whose resources (roles, apps, permissions) are not the ones commons created.
+# Update the commons module to the release that matches this module before applying.
+locals {
+  sca_service_version = "0.0.4"
+  cds_service_version = "2.1.0"
+}
+
+resource "terraform_data" "service_version_check" {
+  lifecycle {
+    precondition {
+      condition     = !(var.sca.enable && var.sca.shared_resources != null) || try(var.sca.shared_resources.version, null) == local.sca_service_version
+      error_message = "SCA version mismatch: this module registers SCA version ${local.sca_service_version}, but sca.shared_resources.version is '${coalesce(try(var.sca.shared_resources.version, null), "not set")}'. Update the commons module to the release that provides SCA version ${local.sca_service_version} and pass its sca output."
+    }
+    precondition {
+      condition     = !(var.cds.enable && var.cds.shared_resources != null) || try(var.cds.shared_resources.version, null) == local.cds_service_version
+      error_message = "CDS version mismatch: this module registers CDS version ${local.cds_service_version}, but cds.shared_resources.version is '${coalesce(try(var.cds.shared_resources.version, null), "not set")}'. Update the commons module to the release that provides CDS version ${local.cds_service_version} and pass its cds output."
+    }
+  }
+}
+
 module "sia" {
   source            = "./modules/sia"
   subscription_id   = var.subscription_id
@@ -36,6 +58,8 @@ module "sca" {
     add_permissions_to_manage_cluster = try(var.sca.shared_resources.add_permissions_to_manage_cluster, false)
     resource_k8s_custom_role_id       = try(var.sca.shared_resources.resource_k8s_custom_role_id, null)
   }
+
+  depends_on = [terraform_data.service_version_check]
 }
 
 module "cds" {
@@ -46,6 +70,8 @@ module "cds" {
     resource_app_id         = var.cds.shared_resources.resource_app_id
     resource_custom_role_id = var.cds.shared_resources.resource_custom_role_id
   }
+
+  depends_on = [terraform_data.service_version_check]
 }
 
 # Create a simple Azure subscription onboarding
@@ -74,7 +100,7 @@ resource "idsec_cce_azure_subscription" "create_subscription" {
     var.sca.enable && var.sca.shared_resources != null ? [
       {
         service_name = "sca"
-        version      = "0.0.4"
+        version      = local.sca_service_version
         resources = {
           applications = [
             {
@@ -90,7 +116,7 @@ resource "idsec_cce_azure_subscription" "create_subscription" {
     var.cds.enable && var.cds.shared_resources != null ? [
       {
         service_name = "cds"
-        version      = "2.1.0"
+        version      = local.cds_service_version
         resources = {
           application_ids = [
             var.cds.shared_resources.entra_app_id,
